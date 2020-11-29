@@ -17,7 +17,7 @@ import time
 import os
 
 import pigpio
-import libraries.DHT22
+import DHT22
 class DHTreader(QtCore.QThread):
     
     data_sensor = QtCore.pyqtSignal(tuple)
