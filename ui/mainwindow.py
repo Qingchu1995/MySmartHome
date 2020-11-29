@@ -149,7 +149,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # grid
         graph.showGrid(x=True, y=True)
         # X,Yrange
-        graph.setXRange(0, 1005, padding=0)
+        graph.setXRange(0, 55, padding=0)
         graph.setYRange(ylim[0], ylim[1], padding=0.1)
 
     def update_plot_data(self,data):
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.x_humi = np.append(self.x_humi, humidity)
         self.dl_temp.setData(self.t, self.x_temp) # update the line
         self.dl_humi.setData(self.t, self.x_humi) # update the line
-        initxlim = 1000
+        initxlim = 50
         if self.t[-1]>initxlim:
             self.graphWidget_temp.setXRange(self.t[-1]-initxlim+5,self.t[-1]+5, padding=0)
             self.graphWidget_humi.setXRange(self.t[-1]-initxlim+5,self.t[-1]+5, padding=0)
