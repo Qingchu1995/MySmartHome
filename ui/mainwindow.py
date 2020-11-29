@@ -123,7 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # grid
         graph.showGrid(x=True, y=True)
         # X,Yrange
-        graph.setXRange(0, 1000, padding=0)
+        graph.setXRange(0, 50, padding=0)
         graph.setYRange(ylim[0], ylim[1], padding=0.1)
 
     def update_plot_data_test(self):
@@ -137,8 +137,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dl_temp.setData(self.t, self.x_temp) # update the line
         self.dl_humi.setData(self.t, self.x_humi) # update the line
         if self.t[-1]>900:
-            self.graphWidget_temp.setXRange(self.t[-1]-1000+100,self.t[-1]+100, padding=0)
-            self.graphWidget_humi.setXRange(self.t[-1]-1000+100,self.t[-1]+100, padding=0)
+            self.graphWidget_temp.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
+            self.graphWidget_humi.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
 
     def update_plot_data(self,data):
         '''
@@ -153,8 +153,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dl_temp.setData(self.t, self.x_temp) # update the line
         self.dl_humi.setData(self.t, self.x_humi) # update the line
         if self.t[-1]>900:
-            self.graphWidget_temp.setXRange(self.t[-1]-1000+100,self.t[-1]+100, padding=0)
-            self.graphWidget_humi.setXRange(self.t[-1]-1000+100,self.t[-1]+100, padding=0)
+            self.graphWidget_temp.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
+            self.graphWidget_humi.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
 
     def read_dht22(self):
         self.dhtreader.init_flags()
