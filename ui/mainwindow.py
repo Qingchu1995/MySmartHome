@@ -16,18 +16,25 @@ import csv
 import time
 import os
 
+import pigpio
+import libraries.DHT22
 class DHTreader(QtCore.QThread):
     
     data_sensor = QtCore.pyqtSignal(tuple)
     is_killed=False
+    DHT2_PIN = 4
+    pi = pigpio.pi()
+    dht22 = DHT22.sensor(pi,4)
+
     def run(self):
         while True:
             if self.is_killed:
                 break
-            time.sleep( 0.1 )
+            time.sleep( 2 )
             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-            humidity = np.random.rand(1)
-            temperature = np.random.rand(1)
+            dht22.trigger()
+            humidity = dht22.humidity#np.random.rand(1)
+            temperature = dht22.temperature#np.random.rand(1)
             self.data_sensor.emit((humidity, temperature))
 
     def kill(self):
@@ -50,8 +57,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.Init_graph(self.graphWidget_temp,'Temperature (°C)','')
-        self.Init_graph(self.graphWidget_humi,'Humidity (%)','Hour (hr)')
+        self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 50])
+        self.Init_graph(self.graphWidget_humi,'Humidity (%)','Hour (hr)',[0, 100])
         
         self.t = np.array([0])
         self.x_temp = np.array([15])
@@ -95,7 +102,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dl = graph.plot(x, y, pen=pen)
         return dl
 
-    def Init_graph(self, graph,xlabel,ylabel):
+    def Init_graph(self, graph,xlabel,ylabel,ylim):
         '''
         graphWidget_temp initialization
         Input parameters:
@@ -117,7 +124,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         graph.showGrid(x=True, y=True)
         # X,Yrange
         graph.setXRange(0, 1000, padding=0)
-        graph.setYRange(-1, 1, padding=0.1)
+        graph.setYRange(ylim[0], ylim[1], padding=0.1)
 
     def update_plot_data_test(self):
         '''
