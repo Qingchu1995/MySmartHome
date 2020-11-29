@@ -33,8 +33,8 @@ class DHTreader(QtCore.QThread):
             time.sleep( 2 )
             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
             self.dht22.trigger()
-            humidity = self.dht22.humidity#np.random.rand(1)
-            temperature = self.dht22.temperature#np.random.rand(1)
+            humidity = self.dht22.humidity/1.0#np.random.rand(1)
+            temperature = self.dht22.temperature/1.0#np.random.rand(1)
             self.data_sensor.emit((humidity, temperature))
 
     def kill(self):
