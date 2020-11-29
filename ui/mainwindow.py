@@ -186,7 +186,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def record_eht22(self,data):
         if self.is_record:
             print("record trigger")
-            data = [data[0][0],data[1][0]]# cast into array
+            data = [data[0],data[1]]# cast into array
             if os.path.exists(self.dhtfn):
                 df = pd.read_csv(self.dhtfn)
                 if df.empty:
