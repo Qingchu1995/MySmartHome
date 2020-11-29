@@ -19,6 +19,9 @@ import os
 import pigpio
 import libraries.DHT22 as DHT22
 class DHTreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
     
     data_sensor = QtCore.pyqtSignal(tuple)
     is_killed=False
@@ -36,13 +39,35 @@ class DHTreader(QtCore.QThread):
             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
             self.data_sensor.emit((humidity, temperature))
-
     def kill(self):
         self.is_killed=True
     def init_flags(self):
         self.is_killed=False
 
 
+
+# class DHTreader(QtCore.QThread):
+#     '''
+#     The class (thread) to read the DHT22 sensor.
+#     '''
+    
+#     data_sensor = QtCore.pyqtSignal(tuple)
+#     is_killed=False
+#     DHT2_PIN = 4
+
+#     def run(self):
+#         while True:
+#             if self.is_killed:
+#                 break
+#             time.sleep( 0.01 )
+#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+#             humidity = 30 + np.random.rand(1)
+#             temperature = 15 + np.random.rand(1)
+#             self.data_sensor.emit((humidity, temperature))
+#     def kill(self):
+#         self.is_killed=True
+#     def init_flags(self):
+#         self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -82,7 +107,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_stop.clicked.connect(self.stop_dht22)
         self.pushButton_record.clicked.connect(self.open_file_folder_dialog)
         self.dhtreader.data_sensor.connect(self.update_plot_data)
-        self.dhtreader.data_sensor.connect(self.record_eht22data)
+        self.dhtreader.data_sensor.connect(self.record_eht22)
         
 
     def Init_plot(self, x, y, graph):
@@ -109,6 +134,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             - graph: pyqtgraph
             - xlabel: string
             - ylabel: string
+            - ylim: 2x1 float array
         '''
         #self.graphWidget_temp.setBackground(QtGui.QColor(100, 50, 254, 25))# the color could be specify by the QtGui.
         # 'background color'
@@ -123,26 +149,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # grid
         graph.showGrid(x=True, y=True)
         # X,Yrange
-        graph.setXRange(0, 50, padding=0)
+        graph.setXRange(0, 1005, padding=0)
         graph.setYRange(ylim[0], ylim[1], padding=0.1)
-
-    def update_plot_data_test(self):
-        '''
-        Update the pyqtgraph plot, called by Qtimer
-        '''
-
-        self.t = np.append(self.t, self.t[-1]+1)
-        self.x_temp = np.append(self.x_temp, np.sin(time.time()))
-        self.x_humi = np.append(self.x_humi, np.sin(time.time()))
-        self.dl_temp.setData(self.t, self.x_temp) # update the line
-        self.dl_humi.setData(self.t, self.x_humi) # update the line
-        if self.t[-1]>900:
-            self.graphWidget_temp.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
-            self.graphWidget_humi.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
 
     def update_plot_data(self,data):
         '''
-        Update the pyqtgraph plot, called by Qtimer
+        Update the pyqtgraph plot, called by thread
         Input:
             - data: 2x1 tuple humidity ; temperature
         '''
@@ -152,19 +164,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.x_humi = np.append(self.x_humi, humidity)
         self.dl_temp.setData(self.t, self.x_temp) # update the line
         self.dl_humi.setData(self.t, self.x_humi) # update the line
-        if self.t[-1]>900:
-            self.graphWidget_temp.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
-            self.graphWidget_humi.setXRange(self.t[-1]-50+5,self.t[-1]+5, padding=0)
+        initxlim = 1000
+        if self.t[-1]>initxlim:
+            self.graphWidget_temp.setXRange(self.t[-1]-initxlim+5,self.t[-1]+5, padding=0)
+            self.graphWidget_humi.setXRange(self.t[-1]-initxlim+5,self.t[-1]+5, padding=0)
 
     def read_dht22(self):
         self.dhtreader.init_flags()
         self.dhtreader.start()
         
-    def resume_dht22(self):
-        self.dhtreader.pause()
-
     def stop_dht22(self):
         self.dhtreader.kill()
+        self.is_record = False
 
     def open_file_folder_dialog(self):
         self.fpath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -172,8 +183,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.is_record=True
         print(self.dhtfn)
 
-    def record_eht22data(self,data):
+    def record_eht22(self,data):
         if self.is_record:
+            print("record trigger")
             data = [data[0][0],data[1][0]]# cast into array
             if os.path.exists(self.dhtfn):
                 df = pd.read_csv(self.dhtfn)
@@ -186,12 +198,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     with open(self.dhtfn, 'a') as f:
                         csvw = csv.writer(f, delimiter=',')
-                        # csvw.writerow(['humidity','temperature'])
                         csvw.writerow(data)
             else:
                 with open(self.dhtfn, 'w') as f:
                         csvw = csv.writer(f, delimiter=',')
                         csvw.writerow(['humidity','temperature'])
                         csvw.writerow(data)
+            f.close()
 
 

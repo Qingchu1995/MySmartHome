@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/qingchu/fun/Smarthome/ui/mainwindow.ui'
+# Form implementation generated from reading ui file '/home/qingchu/fun/Smarthome/code/ui/mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -21,10 +21,10 @@ class Ui_MainWindow(object):
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
         self.graphWidget_temp = PlotWidget(self.splitter)
-        self.graphWidget_temp.setEnabled(False)
+        self.graphWidget_temp.setEnabled(True)
         self.graphWidget_temp.setObjectName("graphWidget_temp")
         self.graphWidget_humi = PlotWidget(self.splitter)
-        self.graphWidget_humi.setEnabled(False)
+        self.graphWidget_humi.setEnabled(True)
         self.graphWidget_humi.setObjectName("graphWidget_humi")
         self.layoutWidget = QtWidgets.QWidget(self.centralWidget)
         self.layoutWidget.setGeometry(QtCore.QRect(800, 80, 91, 201))

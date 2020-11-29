@@ -28,12 +28,12 @@
     </property>
     <widget class="PlotWidget" name="graphWidget_temp" native="true">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="PlotWidget" name="graphWidget_humi" native="true">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
