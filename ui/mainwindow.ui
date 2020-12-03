@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
-      <width>651</width>
-      <height>321</height>
+      <y>10</y>
+      <width>361</width>
+      <height>621</height>
      </rect>
     </property>
     <property name="orientation">
@@ -40,8 +40,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>80</y>
+      <x>380</x>
+      <y>10</y>
       <width>91</width>
       <height>201</height>
      </rect>

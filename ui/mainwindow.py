@@ -15,37 +15,10 @@ import pandas as pd
 import csv
 import time
 import os
+import datetime
 
 import pigpio
 import libraries.DHT22 as DHT22
-class DHTreader(QtCore.QThread):
-    '''
-    The class (thread) to read the DHT22 sensor.
-    '''
-    
-    data_sensor = QtCore.pyqtSignal(tuple)
-    is_killed=False
-    DHT2_PIN = 4
-    pi = pigpio.pi()
-    dht22 = DHT22.sensor(pi,4)
-
-    def run(self):
-        while True:
-            if self.is_killed:
-                break
-            time.sleep( 2 )
-            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-            self.dht22.trigger()
-            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
-            self.data_sensor.emit((humidity, temperature))
-    def kill(self):
-        self.is_killed=True
-    def init_flags(self):
-        self.is_killed=False
-
-
-
 # class DHTreader(QtCore.QThread):
 #     '''
 #     The class (thread) to read the DHT22 sensor.
@@ -54,20 +27,58 @@ class DHTreader(QtCore.QThread):
 #     data_sensor = QtCore.pyqtSignal(tuple)
 #     is_killed=False
 #     DHT2_PIN = 4
+#     pi = pigpio.pi()
+#     dht22 = DHT22.sensor(pi,4)
 
 #     def run(self):
 #         while True:
 #             if self.is_killed:
 #                 break
-#             time.sleep( 0.01 )
+#             time.sleep( 2 )
 #             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             humidity = 30 + np.random.rand(1)
-#             temperature = 15 + np.random.rand(1)
+#             self.dht22.trigger()
+#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
 #             self.data_sensor.emit((humidity, temperature))
 #     def kill(self):
 #         self.is_killed=True
 #     def init_flags(self):
 #         self.is_killed=False
+
+class TimeAxisItem(pg.AxisItem):
+    def __init__(self, *args, **kwargs):
+        super(TimeAxisItem, self).__init__(*args, **kwargs)
+    
+    def int2td(self, ts):
+        return(datetime.timedelta(seconds=float(ts)/1e6))
+
+    def tickStrings(self, values, scale, spacing):
+        print("hahaha")
+        print(values)
+        return [value.strftime("%H:%M:%S") for value in values]
+
+class DHTreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
+    
+    data_sensor = QtCore.pyqtSignal(tuple)
+    is_killed=False
+    DHT2_PIN = 4
+
+    def run(self):
+        while True:
+            if self.is_killed:
+                break
+            time.sleep( 2 )
+            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            humidity = 30 + np.random.rand(1)
+            temperature = 15 + np.random.rand(1)
+            self.data_sensor.emit((humidity[0], temperature[0]))
+    def kill(self):
+        self.is_killed=True
+    def init_flags(self):
+        self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -85,7 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 50])
         self.Init_graph(self.graphWidget_humi,'Humidity (%)','Hour (hr)',[0, 100])
         
-        self.t = np.array([0])
+        self.t = np.array([0])#[datetime.datetime.now()]
         self.x_temp = np.array([15])
         self.x_humi = np.array([50])
         
@@ -124,19 +135,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # pen = pg.mkPen(color=(10, 0, 0))
         # pen = pg.mkPen(color=(255, 0, 0), width=15, style=QtCore.Qt.DashLine)
         pen = pg.mkPen(color=(255, 0, 0), width=5)
+        print(x)
         dl = graph.plot(x, y, pen=pen)
         return dl
 
-    def Init_graph(self, graph,xlabel,ylabel,ylim):
+    def Init_graph(self, graph, xlabel, ylabel, ylim):
         '''
-        graphWidget_temp initialization
+        graphWidget initialization
         Input parameters:
             - graph: pyqtgraph
             - xlabel: string
             - ylabel: string
             - ylim: 2x1 float array
         '''
-        #self.graphWidget_temp.setBackground(QtGui.QColor(100, 50, 254, 25))# the color could be specify by the QtGui.
+        #self.graphWidget.setBackground(QtGui.QColor(100, 50, 254, 25))# the color could be specify by the QtGui.
         # 'background color'
         color = self.palette().color(QtGui.QPalette.Window)  # Get the default window background,
         graph.setBackground(color)
@@ -151,6 +163,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # X,Yrange
         graph.setXRange(0, 55, padding=0)
         graph.setYRange(ylim[0], ylim[1], padding=0.1)
+        # graph.getPlotItem().axes['bottom']['item'] = TimeAxisItem(orientation='bottom')
 
     def update_plot_data(self,data):
         '''
@@ -160,6 +173,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         humidity, temperature = data
         self.t = np.append(self.t, self.t[-1]+1)
+        # self.t = np.append(self.t, datetime.datetime.now())
         self.x_temp = np.append(self.x_temp, temperature)
         self.x_humi = np.append(self.x_humi, humidity)
         self.dl_temp.setData(self.t, self.x_temp) # update the line
@@ -185,14 +199,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def record_eht22(self,data):
         if self.is_record:
-            print("record trigger")
-            data = [data[0],data[1]]# cast into array
+            # print("record trigger")
+            t = datetime.datetime.now()
+            # print(t.strftime("%Y-%m-%d %H:%M:%S"))
+            data = [t.strftime("%Y-%m-%d %H:%M:%S"),data[0],data[1]]# cast into array
             if os.path.exists(self.dhtfn):
                 df = pd.read_csv(self.dhtfn)
                 if df.empty:
                     with open(self.dhtfn, 'w') as f:
                         csvw = csv.writer(f, delimiter=',')
-                        csvw.writerow(['humidity','temperature'])
+                        csvw.writerow(['time','humidity','temperature'])
                         
                         csvw.writerow(data)
                 else:
@@ -202,7 +218,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 with open(self.dhtfn, 'w') as f:
                         csvw = csv.writer(f, delimiter=',')
-                        csvw.writerow(['humidity','temperature'])
+                        csvw.writerow(['time','humidity','temperature'])
                         csvw.writerow(data)
             f.close()
 
