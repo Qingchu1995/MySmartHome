@@ -19,44 +19,6 @@ import datetime
 
 import pigpio
 import libraries.DHT22 as DHT22
-# class DHTreader(QtCore.QThread):
-#     '''
-#     The class (thread) to read the DHT22 sensor.
-#     '''
-    
-#     data_sensor = QtCore.pyqtSignal(tuple)
-#     is_killed=False
-#     DHT2_PIN = 4
-#     pi = pigpio.pi()
-#     dht22 = DHT22.sensor(pi,4)
-
-#     def run(self):
-#         while True:
-#             if self.is_killed:
-#                 break
-#             time.sleep( 2 )
-#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             self.dht22.trigger()
-#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
-#             self.data_sensor.emit((humidity, temperature))
-#     def kill(self):
-#         self.is_killed=True
-#     def init_flags(self):
-#         self.is_killed=False
-
-class TimeAxisItem(pg.AxisItem):
-    def __init__(self, *args, **kwargs):
-        super(TimeAxisItem, self).__init__(*args, **kwargs)
-    
-    def int2td(self, ts):
-        return(datetime.timedelta(seconds=float(ts)/1e6))
-
-    def tickStrings(self, values, scale, spacing):
-        print("hahaha")
-        print(values)
-        return [value.strftime("%H:%M:%S") for value in values]
-
 class DHTreader(QtCore.QThread):
     '''
     The class (thread) to read the DHT22 sensor.
@@ -65,6 +27,8 @@ class DHTreader(QtCore.QThread):
     data_sensor = QtCore.pyqtSignal(tuple)
     is_killed=False
     DHT2_PIN = 4
+    pi = pigpio.pi()
+    dht22 = DHT22.sensor(pi,4)
 
     def run(self):
         while True:
@@ -72,13 +36,49 @@ class DHTreader(QtCore.QThread):
                 break
             time.sleep( 2 )
             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-            humidity = 30 + np.random.rand(1)
-            temperature = 15 + np.random.rand(1)
-            self.data_sensor.emit((humidity[0], temperature[0]))
+            self.dht22.trigger()
+            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+            self.data_sensor.emit((humidity, temperature))
     def kill(self):
         self.is_killed=True
     def init_flags(self):
         self.is_killed=False
+
+# class TimeAxisItem(pg.AxisItem):
+#     def __init__(self, *args, **kwargs):
+#         super(TimeAxisItem, self).__init__(*args, **kwargs)
+    
+#     def int2td(self, ts):
+#         return(datetime.timedelta(seconds=float(ts)/1e6))
+
+#     def tickStrings(self, values, scale, spacing):
+#         print("hahaha")
+#         print(values)
+#         return [value.strftime("%H:%M:%S") for value in values]
+
+# class DHTreader(QtCore.QThread):
+#     '''
+#     The class (thread) to read the DHT22 sensor.
+#     '''
+    
+#     data_sensor = QtCore.pyqtSignal(tuple)
+#     is_killed=False
+#     DHT2_PIN = 4
+
+#     def run(self):
+#         while True:
+#             if self.is_killed:
+#                 break
+#             time.sleep( 2 )
+#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+#             humidity = 30 + np.random.rand(1)
+#             temperature = 15 + np.random.rand(1)
+#             self.data_sensor.emit((humidity[0], temperature[0]))
+#     def kill(self):
+#         self.is_killed=True
+#     def init_flags(self):
+#         self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
