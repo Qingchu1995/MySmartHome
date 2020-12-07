@@ -14,4 +14,4 @@ A matlab plot of the temperature and humidity recording over night,
 ~![Image of matlab plot demo](https://github.com/Qingchu1995/MySmartHome/blob/master/imgs/plot_demo.png)
 
 
-Add a Calendar component into my UI. It can synchronize with your google calendar
+2020/12/6 Add a Calendar component into my UI. It can synchronize with your google calendar
