@@ -4,7 +4,7 @@ import pickle
 import sys
 import threading
 
-from PyQt5 import QtCore, QtGui, QtQml
+from PyQt5 import QtCore, QtGui
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
