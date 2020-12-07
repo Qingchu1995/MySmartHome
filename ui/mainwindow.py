@@ -4,7 +4,7 @@
 Module implementing MainWindow.
 """
 
-from PyQt5.QtCore import pyqtSlot, QLocale, QCalendar
+from PyQt5.QtCore import pyqtSlot, QLocale
 from PyQt5.QtWidgets import QMainWindow,QFileDialog
 from .Ui_mainwindow import Ui_MainWindow
 from PyQt5 import QtWidgets, uic, QtGui,  QtCore
@@ -19,33 +19,33 @@ import datetime
 
 from CalendarBackend import CalendarBackend
 
-# import pigpio
-# import libraries.DHT22 as DHT22
-# class DHTreader(QtCore.QThread):
-#     '''
-#     The class (thread) to read the DHT22 sensor.
-#     '''
+import pigpio
+import libraries.DHT22 as DHT22
+class DHTreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
     
-#     data_sensor = QtCore.pyqtSignal(tuple)
-#     is_killed=False
-#     DHT2_PIN = 4
-#     pi = pigpio.pi()
-#     dht22 = DHT22.sensor(pi,4)
+    data_sensor = QtCore.pyqtSignal(tuple)
+    is_killed=False
+    DHT2_PIN = 4
+    pi = pigpio.pi()
+    dht22 = DHT22.sensor(pi,4)
 
-#     def run(self):
-#         while True:
-#             if self.is_killed:
-#                 break
-#             time.sleep( 2 )
-#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             self.dht22.trigger()
-#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
-#             self.data_sensor.emit((humidity, temperature))
-#     def kill(self):
-#         self.is_killed=True
-#     def init_flags(self):
-#         self.is_killed=False
+    def run(self):
+        while True:
+            if self.is_killed:
+                break
+            time.sleep( 2 )
+            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            self.dht22.trigger()
+            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+            self.data_sensor.emit((humidity, temperature))
+    def kill(self):
+        self.is_killed=True
+    def init_flags(self):
+        self.is_killed=False
 
 # class TimeAxisItem(pg.AxisItem):
 #     def __init__(self, *args, **kwargs):
@@ -59,28 +59,28 @@ from CalendarBackend import CalendarBackend
 #         print(values)
 #         return [value.strftime("%H:%M:%S") for value in values]
 
-class DHTreader(QtCore.QThread):
-    '''
-    The class (thread) to read the DHT22 sensor.
-    '''
+# class DHTreader(QtCore.QThread):
+#     '''
+#     The class (thread) to read the DHT22 sensor.
+#     '''
     
-    data_sensor = QtCore.pyqtSignal(tuple)
-    is_killed=False
-    DHT2_PIN = 4
+#     data_sensor = QtCore.pyqtSignal(tuple)
+#     is_killed=False
+#     DHT2_PIN = 4
 
-    def run(self):
-        while True:
-            if self.is_killed:
-                break
-            time.sleep( 2 )
-            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-            humidity = 30 + np.random.rand(1)
-            temperature = 15 + np.random.rand(1)
-            self.data_sensor.emit((humidity[0], temperature[0]))
-    def kill(self):
-        self.is_killed=True
-    def init_flags(self):
-        self.is_killed=False
+#     def run(self):
+#         while True:
+#             if self.is_killed:
+#                 break
+#             time.sleep( 2 )
+#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+#             humidity = 30 + np.random.rand(1)
+#             temperature = 15 + np.random.rand(1)
+#             self.data_sensor.emit((humidity[0], temperature[0]))
+#     def kill(self):
+#         self.is_killed=True
+#     def init_flags(self):
+#         self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -262,7 +262,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _dispdate(self):
         sdate = self.calendarWidget.selectedDate()
-        # QCalendar.standaloneMonthName(QLocale(),self.calendarWidget.selectedDate())
         d = sdate.toString('d')
         dddd = sdate.toString('dddd')
         mmmmyyyy = sdate.toString('MMMM yyyy')
@@ -313,3 +312,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _handleevents(self, events):
         self._cache_events = events
+
+# todo: 1. change the self.kw to up to this time. 2. organize the code
