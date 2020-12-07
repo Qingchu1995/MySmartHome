@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QLocale
 from ui.mainwindow import MainWindow
 import sys
 import numpy as np
@@ -7,6 +8,7 @@ import os
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
+    QLocale.setDefault(QLocale(QLocale.English))
     ui = MainWindow()
     ui.show()
     sys.exit(app.exec_())
