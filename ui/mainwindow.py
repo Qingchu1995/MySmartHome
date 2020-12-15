@@ -95,16 +95,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon('./imgs/icon.jpg'))
         self.bgcolor = self.palette().color(QtGui.QPalette.Window)  # Get the default window background,
-        print(self.bgcolor.getRgb())
-        ##HUMIDITY and TEMPERATURE WIDGETS INITIALIZATION
+        # print(self.bgcolor.getRgb())
+        print(self.bgcolor.getRgb()[0:3])
+
+        ##--HUMIDITY and TEMPERATURE WIDGETS INITIALIZATION--##
         self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 50])
         self.Init_graph(self.graphWidget_humi,'Humidity (%)','Hour (hr)',[0, 100])
-        
-        self.t = np.array([0])#[datetime.datetime.now()]
+        self.t = np.array([0])
         self.x_temp = np.array([15])
         self.x_humi = np.array([50])
-        
         self.dl_temp = self.Init_plot(self.t, self.x_temp,self.graphWidget_temp) # get a reference for the line
         self.dl_humi = self.Init_plot(self.t, self.x_humi,self.graphWidget_humi) # get a reference for the line
         
@@ -117,46 +118,45 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._dhtfn = 'dht_rec.csv'
         self.dhtfn = None
         
-        # signal and slot
+        # signals and slots
         self.pushButton_read.clicked.connect(self.read_dht22)
         self.pushButton_stop.clicked.connect(self.stop_dht22)
         self.pushButton_record.clicked.connect(self.open_file_folder_dialog)
         self.dhtreader.data_sensor.connect(self.update_plot_data)
         self.dhtreader.data_sensor.connect(self.record_eht22)
 
-        ##CALENDAR WIDGETS INITIALIZATION
 
-        #GOOGLE CALENDAR BACKEND INITIALIZATION
+        ##--CALENDAR WIDGET INITIALIZATION--##
+
+        #google calendar backend initialization
         self._cache_events = []
         self._backend = CalendarBackend()
-        self.kw = {'calendarId': 'primary', 'maxResults': 50, 'orderBy': 'startTime', 'singleEvents': True, 'timeMin': '2020-12-07T04:08:34.594Z'}
-        self._backend.eventsChanged.connect(self._handleevents)
+        t = datetime.datetime.utcnow()
+        t = t.strftime("%Y-%m-%d")+'T'+t.strftime("%H:%M:%S")+'Z'
+        self.kw = {'calendarId': 'primary', 'maxResults': 50, 'orderBy': 'startTime', 'singleEvents': True, 'timeMin': t}
         self._backend.updateListEvents(self.kw)
+        # signals and slots
+        self._backend.eventsChanged.connect(self._handleevents)
 
-
-        # self.calendarWidget.setStyleSheet("background-color: rgb(239,239,239)")
-        # self.CalendarText_d.setFontPointSize(35)
-        # palette = QtGui.QPalette()
-        # palette.setColor(self.bgcolor)
-        # self.CalendarText_d.palette
+        #calendar print year month widget initialization
         font = QtGui.QFont()
         font.setPointSize(16)
         self.CalendarText_dmy.setFont(font)
         self.CalendarText_dmy.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.CalendarText_d.setFrameShape(QtWidgets.QFrame.NoFrame)
-        # self.CalendarText.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.CalendarText_dmy.setStyleSheet("QTextEdit { background-color: rgb(239,239,239)}")# 239,239,239 is the background rgb
-        self.CalendarText_d.setStyleSheet("QTextEdit { background-color: rgb(239,239,239)}")
-        # self.CalendarText.setStyleSheet("QTextEdit { background-color: rgb(239,239,239)}")
+        sheetstyle = 'QTextEdit { background-color: rgb'+str(self.bgcolor.getRgb()[0:3])+'}' # set the background color
+        self.CalendarText_dmy.setStyleSheet(sheetstyle)
+        self.CalendarText_d.setStyleSheet(sheetstyle)
+        
+        #calendar widget initialization
         self.calendarWidget.selectionChanged.connect(self._loadevents)
         
-
-
-        ##LIST WIDGET TEST
+        #calendar event widget initialization
         self.listWidget.clear()
         self.listWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.listWidget.setStyleSheet("background-color: rgb(239,239,239)")
-        self._loadevents()
+        sheetstyle = 'background-color: rgb'+str(self.bgcolor.getRgb()[0:3])
+        self.listWidget.setStyleSheet(sheetstyle)
+        self._loadevents()# not sure why it doesn't display the events (the events is not uploaded even with the sleep)
         
 
 
@@ -174,7 +174,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # pen = pg.mkPen(color=(10, 0, 0))
         # pen = pg.mkPen(color=(255, 0, 0), width=15, style=QtCore.Qt.DashLine)
         pen = pg.mkPen(color=(255, 0, 0), width=5)
-        print(x)
         dl = graph.plot(x, y, pen=pen)
         return dl
 
@@ -237,9 +236,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def record_eht22(self,data):
         if self.is_record:
-            # print("record trigger")
             t = datetime.datetime.now()
-            # print(t.strftime("%Y-%m-%d %H:%M:%S"))
             data = [t.strftime("%Y-%m-%d %H:%M:%S"),data[0],data[1]]# cast into array
             if os.path.exists(self.dhtfn):
                 df = pd.read_csv(self.dhtfn)
@@ -261,6 +258,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             f.close()
 
     def _dispdate(self):
+        '''
+        Convert the selected dat in the calendar to a readable string.
+        Called by _loadevents function
+        Output:
+            - sdate: str selected date
+        '''
         sdate = self.calendarWidget.selectedDate()
         d = sdate.toString('d')
         dddd = sdate.toString('dddd')
@@ -271,6 +274,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def _addevent(self,event):
+        '''
+        Add the event to the calendar list widget with neat format
+        Call by _loadevents function
+        Input:
+            - event: a 2x1 list containing two strings
+        '''
+
         title,time = event
 
         item = QtWidgets.QListWidgetItem()
@@ -296,6 +306,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.listWidget.addItem(item)
 
     def _loadevents(self):
+        '''
+        load and display events in selected date
+        '''
         self.listWidget.clear()
 
         sdate = self._dispdate()
@@ -311,6 +324,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._addevent(e)
 
     def _handleevents(self, events):
+        '''
+        preserve events info requested from google calendar backend
+        Inputs
+            - events: dict
+        '''
         self._cache_events = events
 
-# todo: 1. change the self.kw to up to this time. 2. organize the code
+# todo: 1. organize the code (finish the mainwindow.py, to work on CalendarBackend.py)
+#       2. the time axis in temperature and humidity sensing
+#       3. not sure why the events not loaded once the window is open.

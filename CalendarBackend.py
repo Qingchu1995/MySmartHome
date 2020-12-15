@@ -47,7 +47,7 @@ class CalendarBackend(QtCore.QObject):
         for event in events:
             start = event["start"].get("dateTime", event["start"].get("date"))
             end = event["end"].get("dateTime", event["end"].get("date"))
-            logging.debug(f"From {start} - To {end}:  {event['summary']}")
+            # logging.debug(f"From {start} - To {end}:  {event['summary']}")
 
             start_dt = QtCore.QDateTime.fromString(start, QtCore.Qt.ISODate)
             end_dt = QtCore.QDateTime.fromString(end, QtCore.Qt.ISODate)
@@ -60,18 +60,18 @@ class CalendarBackend(QtCore.QObject):
 
     def _update_credentials(self):
         creds = None
-        if os.path.exists("token.pickle"):
-            with open("token.pickle", "rb") as token:
+        if os.path.exists("../token/token.pickle"):
+            with open("../token/token.pickle", "rb") as token:
                 creds = pickle.load(token)
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", SCOPES
+                    "../token/credentials.json", SCOPES
                 )
                 creds = flow.run_local_server(port=0)
-            with open("token.pickle", "wb") as token:
+            with open("../token/token.pickle", "wb") as token:
                 pickle.dump(creds, token)
 
         self._service = build("calendar", "v3", credentials=creds, cache_discovery=False)
