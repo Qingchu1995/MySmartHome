@@ -22,38 +22,38 @@ from CalendarBackend import CalendarBackend
 import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
-class Sensorreader(QtCore.QThread):
-    '''
-    The class (thread) to read the DHT22 sensor.
-    '''
+# class Sensorreader(QtCore.QThread):
+#     '''
+#     The class (thread) to read the DHT22 sensor.
+#     '''
     
-    data_sensor = QtCore.pyqtSignal(tuple)
-    is_killed=False
-    #dht initalization
-    DHT2_PIN = 4
-    pi = pigpio.pi()
-    dht22 = DHT22.sensor(pi,4)
+#     data_sensor = QtCore.pyqtSignal(tuple)
+#     is_killed=False
+#     #dht initalization
+#     DHT2_PIN = 4
+#     pi = pigpio.pi()
+#     dht22 = DHT22.sensor(pi,4)
 
-    #sds011 initalization
-    sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
+#     #sds011 initalization
+#     sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
 
-    def run(self):
-        while True:
-            if self.is_killed:
-                break
-            time.sleep( 2 )
-            self.dht22.trigger()
-            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+#     def run(self):
+#         while True:
+#             if self.is_killed:
+#                 break
+#             time.sleep( 2 )
+#             self.dht22.trigger()
+#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
 
-            pm25,pm10 = self.sds011.query()
+#             pm25,pm10 = self.sds011.query()
 
-            self.data_sensor.emit((humidity, temperature,pm25,pm10))
+#             self.data_sensor.emit((humidity, temperature,pm25,pm10))
 
-    def kill(self):
-        self.is_killed=True
-    def init_flags(self):
-        self.is_killed=False
+#     def kill(self):
+#         self.is_killed=True
+#     def init_flags(self):
+#         self.is_killed=False
 
 def timestamp():
     return int(time.mktime(datetime.datetime.now().timetuple()))
@@ -68,28 +68,28 @@ class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
         return [datetime.datetime.fromtimestamp(value).strftime("%H:%M") for value in values]
 
-# class DHTreader(QtCore.QThread):
-#     '''
-#     The class (thread) to read the DHT22 sensor.
-#     '''
+class Sensorreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
     
-#     data_sensor = QtCore.pyqtSignal(tuple)
-#     is_killed=False
-#     DHT2_PIN = 4
+    data_sensor = QtCore.pyqtSignal(tuple)
+    is_killed=False
+    DHT2_PIN = 4
 
-#     def run(self):
-#         while True:
-#             if self.is_killed:
-#                 break
-#             time.sleep( 2 )
-#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             humidity = 30 + np.random.rand(1)
-#             temperature = 15 + np.random.rand(1)
-#             self.data_sensor.emit((humidity[0], temperature[0]))
-#     def kill(self):
-#         self.is_killed=True
-#     def init_flags(self):
-#         self.is_killed=False
+    def run(self):
+        while True:
+            if self.is_killed:
+                break
+            time.sleep( 2 )
+            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            humidity = 30 + np.random.rand(1)
+            temperature = 15 + np.random.rand(1)
+            self.data_sensor.emit((humidity[0], temperature[0],4,5))
+    def kill(self):
+        self.is_killed=True
+    def init_flags(self):
+        self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -142,8 +142,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.x_pm10 = np.array([0])
         self.dl_temp = self.Init_plot(self.t, self.x_temp,self.graphWidget_temp) # get a reference for the line
         self.dl_humi = self.Init_plot(self.t, self.x_humi,self.graphWidget_humi) # get a reference for the line
-        self.dl_pm25 = self.Init_plot(self.t, self.X_pm25,self.graphWidget_pm25) # get a reference for the line
-        self.dl_pm10 = self.Init_plot(self.t, self.X_pm10,self.graphWidget_pm10) # get a reference for the line
+        self.dl_pm25 = self.Init_plot(self.t, self.x_pm25,self.graphWidget_pm25) # get a reference for the line
+        self.dl_pm10 = self.Init_plot(self.t, self.x_pm10,self.graphWidget_pm10) # get a reference for the line
         
         # initialize the timer for the dynamical update
         self.sensorreader = Sensorreader(self)
