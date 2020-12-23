@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -193,7 +193,7 @@ class Ui_MainWindow(object):
         self.pushButton_stop.setText(_translate("MainWindow", "stop"))
         self.pushButton_record.setText(_translate("MainWindow", "Record"))
         self.pushButton_read.setText(_translate("MainWindow", "Read"))
-from pyqtgraph import PlotWidget
+# from pyqtgraph import PlotWidget
 
 
 if __name__ == "__main__":
