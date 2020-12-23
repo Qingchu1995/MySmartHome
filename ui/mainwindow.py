@@ -22,9 +22,11 @@ from CalendarBackend import CalendarBackend
 import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
+from utils.utils import *
+
 class Sensorreader(QtCore.QThread):
     '''
-    The class (thread) to read the DHT22 sensor.
+    The class (thread) to read the DHT22 sensor and SDS011 sensor.
     '''
     
     data_sensor = QtCore.pyqtSignal(tuple)
@@ -54,10 +56,6 @@ class Sensorreader(QtCore.QThread):
         self.is_killed=True
     def init_flags(self):
         self.is_killed=False
-
-def timestamp():
-    return int(time.mktime(datetime.datetime.now().timetuple()))
-
 
 class TimeAxisItem(pg.AxisItem):
     def __init__(self, *args, **kwargs):
@@ -133,8 +131,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 40])
         self.Init_graph(self.graphWidget_humi,'Humidity (%)','Time',[20, 80])
-        self.Init_graph(self.graphWidget_pm25,'PM 2.5 (ug/m^3)','',[0, 40])
-        self.Init_graph(self.graphWidget_pm10,'PM 10 (ug/m^3)','Time',[0, 60])
+        self.Init_graph(self.graphWidget_pm25,'PM 2.5 (ug/m^3)','',[0, 15])
+        self.Init_graph(self.graphWidget_pm10,'PM 10 (ug/m^3)','Time',[0, 20])
         self.t = np.array([timestamp()])
         self.x_temp = np.array([15])
         self.x_humi = np.array([50])
