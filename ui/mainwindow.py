@@ -129,10 +129,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.graphWidget_pm10.setObjectName("graphWidget_pm10")
         self.verticalLayout.addWidget(self.graphWidget_pm10)
 
-        self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 40])#"\u03BCg/m"+u'\u00B3'
+        self.Init_graph(self.graphWidget_temp,'Temp (°C)','',[0, 40])
         self.Init_graph(self.graphWidget_humi,'Humidity (%)','',[20, 80])
-        self.Init_graph(self.graphWidget_pm25,'PM2.5 ('+"\u03BCg/m"+u'\u00B3'+')','',[0, 15])
-        self.Init_graph(self.graphWidget_pm10,'PM10 ('+"\u03BCg/m"+u'\u00B3'+')','Time',[0, 20])
+        self.Init_graph(self.graphWidget_pm25,'PM2.5 ('+"\u03BCg/m"+u'\u00B3'+')','',[0, 50])
+        self.Init_graph(self.graphWidget_pm10,'PM10 ('+"\u03BCg/m"+u'\u00B3'+')','Time',[0, 70])
 
         self.t = np.array([timestamp()])
         self.x_temp = np.array([15])
@@ -164,7 +164,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #saving csv path
         self.is_record = False # whether start to record
         self.fpath = None
-        self._dhtfn = 'dht_rec.csv'
+        now = datetime.datetime.now()
+        now = now.strftime("%Y/%m/%d")
+        self._dhtfn = 'Environment.'+now+'.csv'
+
         self.dhtfn = None
         
         # signals and slots
