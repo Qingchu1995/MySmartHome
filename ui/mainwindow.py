@@ -208,11 +208,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._loadevents()# not sure why it doesn't display the events (the events is not uploaded even with the sleep)
 
         ##--------PHOTO LABLE INITIALIZATION--------##
-        pixmap = QtGui.QPixmap('./imgs/photolabel1.jpg')
+        pixmap = QtGui.QPixmap('../imgs_private/photolabel1.jpg')
         self.photolabel_1.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
-        pixmap = QtGui.QPixmap('./imgs/photolabel4.jpg')
+        pixmap = QtGui.QPixmap('../imgs_private/photolabel4.jpg')
         self.photolabel_2.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
-        pixmap = QtGui.QPixmap('./imgs/photolabel3.jpg')
+        pixmap = QtGui.QPixmap('../imgs_private/photolabel3.jpg')
         self.photolabel_3.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
         # pixmap = QtGui.QPixmap('./imgs/photolabel4.jpg')
         # self.photolabel_4.setPixmap(pixmap.scaled(self.layoutWidget1.width()/4,self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
