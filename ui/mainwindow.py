@@ -19,7 +19,7 @@ import datetime
 
 # from CalendarBackend import CalendarBackend
 
-import pigpio
+# import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
 from libraries.CalendarBackend import CalendarBackend
@@ -196,7 +196,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         sheetstyle = 'QTextEdit { background-color: rgb'+str(self.bgcolor.getRgb()[0:3])+'}' # set the background color
         self.CalendarText_dmy.setStyleSheet(sheetstyle)
         self.CalendarText_d.setStyleSheet(sheetstyle)
-        
+        self.CalendarText_d.setAlignment(QtCore.Qt.AlignCenter)
+
         #calendar widget initialization
         self.calendarWidget.selectionChanged.connect(self._loadevents)
         

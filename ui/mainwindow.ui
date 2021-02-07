@@ -34,9 +34,28 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QCalendarWidget" name="calendarWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QSplitter" name="splitter_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="orientation">
         <enum>Qt::Vertical</enum>
+       </property>
+       <property name="handleWidth">
+        <number>1</number>
        </property>
        <widget class="QSplitter" name="splitter_2">
         <property name="enabled">
@@ -50,6 +69,9 @@
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>1</number>
         </property>
         <widget class="QTextBrowser" name="CalendarText_d">
          <property name="sizePolicy">
@@ -205,9 +227,6 @@
         </item>
        </widget>
       </widget>
-     </item>
-     <item>
-      <widget class="QCalendarWidget" name="calendarWidget"/>
      </item>
     </layout>
    </widget>
