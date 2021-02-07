@@ -165,8 +165,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.is_record = False # whether start to record
         self.fpath = None
         now = datetime.datetime.now()
-        now = now.strftime("%Y/%m/%d")
-        self._dhtfn = 'Environment.'+now+'.csv'
+        now = now.strftime("%Y%m%d")
+        self._dhtfn = "Environment."+now+".csv"
         
         # signals and slots
         self.pushButton_read.clicked.connect(self.read_sensor)
@@ -316,12 +316,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fpath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.dhtfn = os.path.join(self.fpath,self._dhtfn)
         self.is_record=True
-        print(self.dhtfn)
 
     def record_sensor(self,data):
         if self.is_record:
             t = datetime.datetime.now()
-            data = [t.strftime("%Y-%m-%d %H:%M:%S"),data[0],data[1]]# cast into array
+            data = [t.strftime("%Y-%m-%d %H:%M:%S"),data[0],data[1],data[2],data[3]]# cast into array
             if os.path.exists(self.dhtfn):
                 df = pd.read_csv(self.dhtfn)
                 if df.empty:
