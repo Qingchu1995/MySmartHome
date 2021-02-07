@@ -17,45 +17,45 @@ import time
 import os
 import datetime
 
-from CalendarBackend import CalendarBackend
+# from CalendarBackend import CalendarBackend
 
-import pigpio
+# import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
+from libraries.CalendarBackend import CalendarBackend
 from utils.utils import *
 
-class Sensorreader(QtCore.QThread):
-    '''
-    The class (thread) to read the DHT22 sensor and SDS011 sensor.
-    '''
+# class Sensorreader(QtCore.QThread):
+#     '''
+#     The class (thread) to read the DHT22 sensor and SDS011 sensor.
+#     '''
     
-    data_sensor = QtCore.pyqtSignal(tuple)
-    is_killed=False
-    #dht initalization
-    DHT2_PIN = 4
-    pi = pigpio.pi()
-    dht22 = DHT22.sensor(pi,4)
+#     data_sensor = QtCore.pyqtSignal(tuple)
+#     is_killed=False
+#     #dht initalization
+#     DHT2_PIN = 4
+#     pi = pigpio.pi()
+#     dht22 = DHT22.sensor(pi,4)
 
-    #sds011 initalization
-    sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
+#     #sds011 initalization
+#     sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
 
-    def run(self):
-        while True:
-            if self.is_killed:
-                break
-            time.sleep( 2 )
-            self.dht22.trigger()
-            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+#     def run(self):
+#         while True:
+#             if self.is_killed:
+#                 break
+#             time.sleep( 2 )
+#             self.dht22.trigger()
+#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+#             pm25,pm10 = self.sds011.query()
 
-            pm25,pm10 = self.sds011.query()
+#             self.data_sensor.emit((humidity, temperature,pm25,pm10))
 
-            self.data_sensor.emit((humidity, temperature,pm25,pm10))
-
-    def kill(self):
-        self.is_killed=True
-    def init_flags(self):
-        self.is_killed=False
+#     def kill(self):
+#         self.is_killed=True
+#     def init_flags(self):
+#         self.is_killed=False
 
 class TimeAxisItem(pg.AxisItem):
     def __init__(self, *args, **kwargs):
@@ -66,28 +66,28 @@ class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
         return [datetime.datetime.fromtimestamp(value).strftime("%H:%M") for value in values]
 
-# class Sensorreader(QtCore.QThread):
-#     '''
-#     The class (thread) to read the DHT22 sensor.
-#     '''
+class Sensorreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
     
-#     data_sensor = QtCore.pyqtSignal(tuple)
-#     is_killed=False
-#     DHT2_PIN = 4
+    data_sensor = QtCore.pyqtSignal(tuple)
+    is_killed=False
+    DHT2_PIN = 4
 
-#     def run(self):
-#         while True:
-#             if self.is_killed:
-#                 break
-#             time.sleep( 2 )
-#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             humidity = 30 + np.random.rand(1)
-#             temperature = 15 + np.random.rand(1)
-#             self.data_sensor.emit((humidity[0], temperature[0],4,5))
-#     def kill(self):
-#         self.is_killed=True
-#     def init_flags(self):
-#         self.is_killed=False
+    def run(self):
+        while True:
+            if self.is_killed:
+                break
+            time.sleep( 2 )
+            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            humidity = 30 + np.random.rand(1)
+            temperature = 15 + np.random.rand(1)
+            self.data_sensor.emit((humidity[0], temperature[0],4,5))
+    def kill(self):
+        self.is_killed=True
+    def init_flags(self):
+        self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -107,41 +107,56 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # print(self.bgcolor.getRgb())
         print(self.bgcolor.getRgb()[0:3])
 
-        ##--HUMIDITY, TEMPERATURE, PM2.5 AND PM10 WIDGETS INITIALIZATION--##
-        #overwrite the four pyqtgraph widget to use TimeAxisItem class
-        self.graphWidget_temp = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        ##--------HUMIDITY, TEMPERATURE, PM2.5 AND PM10 WIDGETS INITIALIZATION--------##
+        #Initialize the four pyqtgraph widget to use TimeAxisItem class
+        self.graphWidget_temp = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_temp.setEnabled(False)
         self.graphWidget_temp.setObjectName("graphWidget_temp")
-        self.gridLayout.addWidget(self.graphWidget_temp, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.graphWidget_temp)
 
-        self.graphWidget_humi = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_humi = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_humi.setEnabled(False)
         self.graphWidget_humi.setObjectName("graphWidget_humi")
-        self.gridLayout.addWidget(self.graphWidget_humi, 1, 0, 1, 1)
+        self.verticalLayout.addWidget(self.graphWidget_humi)
 
-        self.graphWidget_pm25 = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_pm25 = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_pm25.setEnabled(False)
         self.graphWidget_pm25.setObjectName("graphWidget_pm25")
-        self.gridLayout.addWidget(self.graphWidget_pm25, 0, 1, 1, 1)
+        self.verticalLayout.addWidget(self.graphWidget_pm25)
 
-        self.graphWidget_pm10 = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_pm10 = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_pm10.setEnabled(False)
         self.graphWidget_pm10.setObjectName("graphWidget_pm10")
-        self.gridLayout.addWidget(self.graphWidget_pm10, 1, 1, 1, 1)
+        self.verticalLayout.addWidget(self.graphWidget_pm10)
 
-        self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 40])
-        self.Init_graph(self.graphWidget_humi,'Humidity (%)','Time',[20, 80])
-        self.Init_graph(self.graphWidget_pm25,'PM 2.5 (ug/m^3)','',[0, 15])
-        self.Init_graph(self.graphWidget_pm10,'PM 10 (ug/m^3)','Time',[0, 20])
+        self.Init_graph(self.graphWidget_temp,'Temperature (°C)','',[0, 40])#"\u03BCg/m"+u'\u00B3'
+        self.Init_graph(self.graphWidget_humi,'Humidity (%)','',[20, 80])
+        self.Init_graph(self.graphWidget_pm25,'PM2.5 ('+"\u03BCg/m"+u'\u00B3'+')','',[0, 15])
+        self.Init_graph(self.graphWidget_pm10,'PM10 ('+"\u03BCg/m"+u'\u00B3'+')','Time',[0, 20])
+
         self.t = np.array([timestamp()])
         self.x_temp = np.array([15])
         self.x_humi = np.array([50])
         self.x_pm25 = np.array([0])
         self.x_pm10 = np.array([0])
-        self.dl_temp = self.Init_plot(self.t, self.x_temp,self.graphWidget_temp) # get a reference for the line
-        self.dl_humi = self.Init_plot(self.t, self.x_humi,self.graphWidget_humi) # get a reference for the line
-        self.dl_pm25 = self.Init_plot(self.t, self.x_pm25,self.graphWidget_pm25) # get a reference for the line
-        self.dl_pm10 = self.Init_plot(self.t, self.x_pm10,self.graphWidget_pm10) # get a reference for the line
+        self.dl_temp = self.Init_plot(self.t, self.x_temp,self.graphWidget_temp,(187, 143, 206)) # get a reference for the line
+        self.dl_humi = self.Init_plot(self.t, self.x_humi,self.graphWidget_humi,(93, 173, 226)) # get a reference for the line
+        self.dl_pm25 = self.Init_plot(self.t, self.x_pm25,self.graphWidget_pm25,( 35, 155, 86 )) # get a reference for the line
+        self.dl_pm10 = self.Init_plot(self.t, self.x_pm10,self.graphWidget_pm10,( 25, 111, 61 )) # get a reference for the line
+
+        # initialize the ploting labels
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        self.label_temp.setFont(font)
+        self.label_humi.setFont(font)
+        self.label_pm25.setFont(font)
+        self.label_pm10.setFont(font)
+        self.label_temp.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_humi.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_pm25.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_pm10.setAlignment(QtCore.Qt.AlignCenter)
+
         
         # initialize the timer for the dynamical update
         self.sensorreader = Sensorreader(self)
@@ -158,9 +173,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_record.clicked.connect(self.open_file_folder_dialog)
         self.sensorreader.data_sensor.connect(self.update_plot_data)
         self.sensorreader.data_sensor.connect(self.record_sensor)
+        
 
-
-        ##--CALENDAR WIDGET INITIALIZATION--##
+        ##--------CALENDAR WIDGET INITIALIZATION--------##
 
         #google calendar backend initialization
         self._cache_events = []
@@ -192,33 +207,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.listWidget.setStyleSheet(sheetstyle)
         self._loadevents()# not sure why it doesn't display the events (the events is not uploaded even with the sleep)
 
-        ##--PHOTO LABLE INITIALIZATION--##
-        # pixmap = QtGui.QPixmap('./imgs/photolabel1.jpg')
-        # # self.photolabel_1.setPixmap(pixmap)
-        # self.photolabel_1.setPixmap(pixmap.scaled(self.photolabel_1.width(),self.photolabel_1.height(),QtCore.Qt.KeepAspectRatio))
-        # # self.photolabel_1.setPixmap(pixmap.scaled(self.photolabel_1.width(),self.photolabel_1.height()))
-        # pixmap = QtGui.QPixmap('./imgs/photolabel2.jpg')
-        # self.photolabel_2.setPixmap(pixmap.scaled(self.photolabel_2.width(),self.photolabel_2.height(),QtCore.Qt.KeepAspectRatio))
-        # pixmap = QtGui.QPixmap('./imgs/photolabel3.jpg')
-        # self.photolabel_3.setPixmap(pixmap.scaled(self.photolabel_3.width(),self.photolabel_3.height(),QtCore.Qt.KeepAspectRatio))
+        ##--------PHOTO LABLE INITIALIZATION--------##
+        pixmap = QtGui.QPixmap('./imgs/photolabel1.jpg')
+        self.photolabel_1.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
+        pixmap = QtGui.QPixmap('./imgs/photolabel4.jpg')
+        self.photolabel_2.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
+        pixmap = QtGui.QPixmap('./imgs/photolabel3.jpg')
+        self.photolabel_3.setPixmap(pixmap.scaled(self.layoutWidget1.width(),self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
         # pixmap = QtGui.QPixmap('./imgs/photolabel4.jpg')
-        # self.photolabel_4.setPixmap(pixmap.scaled(self.photolabel_4.width(),self.photolabel_4.height(),QtCore.Qt.KeepAspectRatio))
+        # self.photolabel_4.setPixmap(pixmap.scaled(self.layoutWidget1.width()/4,self.layoutWidget1.height(),QtCore.Qt.KeepAspectRatio))
 
+        pixmap = QtGui.QPixmap('./imgs/temp.png')
+        self.photolabel_temp.setPixmap(pixmap.scaled(self.layoutWidget_2.width()/4,self.layoutWidget_2.height(),QtCore.Qt.KeepAspectRatio))
+        self.photolabel_temp.setAlignment(QtCore.Qt.AlignCenter)
+        pixmap = QtGui.QPixmap('./imgs/humidity.png')
+        self.photolabel_humi.setPixmap(pixmap.scaled(self.layoutWidget_2.width()/4,self.layoutWidget_2.height(),QtCore.Qt.KeepAspectRatio))
+        self.photolabel_humi.setAlignment(QtCore.Qt.AlignCenter)
+        pixmap = QtGui.QPixmap('./imgs/pm2.5.png')
+        self.photolabel_pm25.setPixmap(pixmap.scaled(self.layoutWidget_2.width()/4,self.layoutWidget_2.height(),QtCore.Qt.KeepAspectRatio))
+        self.photolabel_pm25.setAlignment(QtCore.Qt.AlignCenter)
+        pixmap = QtGui.QPixmap('./imgs/pm2.5.png')
+        self.photolabel_pm10.setPixmap(pixmap.scaled(self.layoutWidget_2.width()/4,self.layoutWidget_2.height(),QtCore.Qt.KeepAspectRatio))
+        self.photolabel_pm10.setAlignment(QtCore.Qt.AlignCenter)
 
-    def Init_plot(self, x, y, graph):
+    def Init_plot(self, x, y, graph, color):
         '''
         Initialize the plot
         Input parameters:
             - x: 1D numpy
             - y: 1D numpy
             - graph: pyqtgraph
+            - color 3x1 tuple
         Output
             - graph.plot
         '''
         # 'Line color, width & style'
         # pen = pg.mkPen(color=(10, 0, 0))
         # pen = pg.mkPen(color=(255, 0, 0), width=15, style=QtCore.Qt.DashLine)
-        pen = pg.mkPen(color=(255, 0, 0), width=3)
+        pen = pg.mkPen(color=color, width=3)
         dl = graph.plot(x, y, pen=pen)
         return dl
 
@@ -250,9 +276,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         Update the pyqtgraph plot, called by thread
         Input:
-            - data: 2x1 tuple humidity ; temperature
+            - data: 4x1 tuple temperature; humidity ; pm2.5; pm10.
         '''
         humidity, temperature,pm25,pm10 = data
+        # update labels
+        self.label_temp.setText("{:.1f}".format(temperature)+u"\N{DEGREE SIGN}"+"C")
+        self.label_humi.setText("{:.0f}%".format(humidity))
+        self.label_pm25.setText("{:.1f}".format(pm25)+"\u03BCg/m"+u'\u00B3')
+        self.label_pm10.setText("{:.1f}".format(pm10)+"\u03BCg/m"+u'\u00B3')
+        # update figures
         self.t = np.append(self.t, timestamp())
         self.x_temp = np.append(self.x_temp, temperature)
         self.x_humi = np.append(self.x_humi, humidity)
@@ -382,6 +414,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._cache_events = events
 
 # todo: 1. organize the code (finish the mainwindow.py, to work on CalendarBackend.py)
-#       2. the time axis in temperature and humidity sensing
-#       3. not sure why the events not loaded once the window is open.
-#       4. add the PM2.5/10 sensor pyqtgraph into the software
+#       2. not sure why the events not loaded once the window is open.
