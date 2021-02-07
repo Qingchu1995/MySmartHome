@@ -167,8 +167,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         now = datetime.datetime.now()
         now = now.strftime("%Y/%m/%d")
         self._dhtfn = 'Environment.'+now+'.csv'
-
-        self.dhtfn = None
         
         # signals and slots
         self.pushButton_read.clicked.connect(self.read_sensor)
