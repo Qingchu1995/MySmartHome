@@ -19,7 +19,7 @@ import datetime
 
 # from CalendarBackend import CalendarBackend
 
-# import pigpio
+import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
 from libraries.CalendarBackend import CalendarBackend
