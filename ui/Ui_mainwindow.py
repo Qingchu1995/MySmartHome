@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/qingchu/fun/Smarthome/code/ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.0
 #
@@ -185,23 +185,23 @@ class Ui_MainWindow(object):
         self.photolabel_pm10.setText("")
         self.photolabel_pm10.setObjectName("photolabel_pm10")
         self.horizontalLayout_7.addWidget(self.photolabel_pm10)
-        self.widget = QtWidgets.QWidget(self.centralWidget)
-        self.widget.setGeometry(QtCore.QRect(40, 20, 641, 571))
-        self.widget.setObjectName("widget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.widget)
+        self.layoutWidget3 = QtWidgets.QWidget(self.centralWidget)
+        self.layoutWidget3.setGeometry(QtCore.QRect(40, 20, 641, 571))
+        self.layoutWidget3.setObjectName("layoutWidget3")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget3)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.widget1 = QtWidgets.QWidget(self.centralWidget)
-        self.widget1.setGeometry(QtCore.QRect(40, 780, 641, 61))
-        self.widget1.setObjectName("widget1")
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.widget1)
+        self.layoutWidget4 = QtWidgets.QWidget(self.centralWidget)
+        self.layoutWidget4.setGeometry(QtCore.QRect(40, 780, 641, 61))
+        self.layoutWidget4.setObjectName("layoutWidget4")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.layoutWidget4)
         self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.label_temp = QtWidgets.QLabel(self.widget1)
+        self.label_temp = QtWidgets.QLabel(self.layoutWidget4)
         self.label_temp.setText("")
         self.label_temp.setObjectName("label_temp")
         self.horizontalLayout_5.addWidget(self.label_temp)
-        self.label_humi = QtWidgets.QLabel(self.widget1)
+        self.label_humi = QtWidgets.QLabel(self.layoutWidget4)
         font = QtGui.QFont()
         font.setBold(True)
         font.setItalic(False)
@@ -214,17 +214,21 @@ class Ui_MainWindow(object):
         self.label_humi.setAlignment(QtCore.Qt.AlignCenter)
         self.label_humi.setObjectName("label_humi")
         self.horizontalLayout_5.addWidget(self.label_humi)
-        self.label_pm25 = QtWidgets.QLabel(self.widget1)
+        self.label_pm25 = QtWidgets.QLabel(self.layoutWidget4)
         self.label_pm25.setText("")
         self.label_pm25.setObjectName("label_pm25")
         self.horizontalLayout_5.addWidget(self.label_pm25)
-        self.label_pm10 = QtWidgets.QLabel(self.widget1)
+        self.label_pm10 = QtWidgets.QLabel(self.layoutWidget4)
         self.label_pm10.setText("")
         self.label_pm10.setObjectName("label_pm10")
         self.horizontalLayout_5.addWidget(self.label_pm10)
+        self.pushButton = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton.setGeometry(QtCore.QRect(310, 640, 89, 25))
+        self.pushButton.setObjectName("pushButton")
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)
+        self.pushButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -246,13 +250,4 @@ class Ui_MainWindow(object):
         self.pushButton_stop.setText(_translate("MainWindow", "stop"))
         self.pushButton_record.setText(_translate("MainWindow", "Record"))
         self.pushButton_read.setText(_translate("MainWindow", "Read"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+        self.pushButton.setText(_translate("MainWindow", "exit"))

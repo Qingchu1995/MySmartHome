@@ -19,43 +19,11 @@ import datetime
 
 # from CalendarBackend import CalendarBackend
 
-import pigpio
+# import pigpio
 import libraries.DHT22 as DHT22
 import libraries.SDS011 as SDS011
 from libraries.CalendarBackend import CalendarBackend
 from utils.utils import *
-
-class Sensorreader(QtCore.QThread):
-    '''
-    The class (thread) to read the DHT22 sensor and SDS011 sensor.
-    '''
-    
-    data_sensor = QtCore.pyqtSignal(tuple)
-    is_killed=False
-    #dht initalization
-    DHT2_PIN = 4
-    pi = pigpio.pi()
-    dht22 = DHT22.sensor(pi,4)
-
-    #sds011 initalization
-    sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
-
-    def run(self):
-        while True:
-            if self.is_killed:
-                break
-            time.sleep( 2 )
-            self.dht22.trigger()
-            humidity = self.dht22.humidity()/1.0#np.random.rand(1)
-            temperature = self.dht22.temperature()/1.0#np.random.rand(1)
-            pm25,pm10 = self.sds011.query()
-
-            self.data_sensor.emit((humidity, temperature,pm25,pm10))
-
-    def kill(self):
-        self.is_killed=True
-    def init_flags(self):
-        self.is_killed=False
 
 class TimeAxisItem(pg.AxisItem):
     def __init__(self, *args, **kwargs):
@@ -66,28 +34,62 @@ class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
         return [datetime.datetime.fromtimestamp(value).strftime("%H:%M") for value in values]
 
+
 # class Sensorreader(QtCore.QThread):
 #     '''
-#     The class (thread) to read the DHT22 sensor.
+#     The class (thread) to read the DHT22 sensor and SDS011 sensor.
 #     '''
     
 #     data_sensor = QtCore.pyqtSignal(tuple)
 #     is_killed=False
+#     #dht initalization
 #     DHT2_PIN = 4
+#     pi = pigpio.pi()
+#     dht22 = DHT22.sensor(pi,4)
+
+#     #sds011 initalization
+#     sds011 = SDS011.SDS011("/dev/ttyUSB0", use_query_mode=True)
 
 #     def run(self):
 #         while True:
 #             if self.is_killed:
 #                 break
 #             time.sleep( 2 )
-#             # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-#             humidity = 30 + np.random.rand(1)
-#             temperature = 15 + np.random.rand(1)
-#             self.data_sensor.emit((humidity[0], temperature[0],4,5))
+#             self.dht22.trigger()
+#             humidity = self.dht22.humidity()/1.0#np.random.rand(1)
+#             temperature = self.dht22.temperature()/1.0#np.random.rand(1)
+#             pm25,pm10 = self.sds011.query()
+
+#             self.data_sensor.emit((humidity, temperature,pm25,pm10))
+
 #     def kill(self):
 #         self.is_killed=True
 #     def init_flags(self):
 #         self.is_killed=False
+
+
+class Sensorreader(QtCore.QThread):
+    '''
+    The class (thread) to read the DHT22 sensor.
+    '''
+    
+    data_sensor = QtCore.pyqtSignal(tuple)
+    is_killed=False
+    DHT2_PIN = 4
+
+    def run(self):
+        while True:
+            if self.is_killed:
+                break
+            time.sleep( 2 )
+            # humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            humidity = 30 + np.random.rand(1)
+            temperature = 15 + np.random.rand(1)
+            self.data_sensor.emit((humidity[0], temperature[0],4,5))
+    def kill(self):
+        self.is_killed=True
+    def init_flags(self):
+        self.is_killed=False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -106,25 +108,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bgcolor = self.palette().color(QtGui.QPalette.Window)  # Get the default window background,
         # print(self.bgcolor.getRgb())
         print(self.bgcolor.getRgb()[0:3])
+        self.showFullScreen()
 
         ##--------HUMIDITY, TEMPERATURE, PM2.5 AND PM10 WIDGETS INITIALIZATION--------##
         #Initialize the four pyqtgraph widget to use TimeAxisItem class
-        self.graphWidget_temp = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_temp = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_temp.setEnabled(False)
         self.graphWidget_temp.setObjectName("graphWidget_temp")
         self.verticalLayout.addWidget(self.graphWidget_temp)
 
-        self.graphWidget_humi = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_humi = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_humi.setEnabled(False)
         self.graphWidget_humi.setObjectName("graphWidget_humi")
         self.verticalLayout.addWidget(self.graphWidget_humi)
 
-        self.graphWidget_pm25 = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_pm25 = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_pm25.setEnabled(False)
         self.graphWidget_pm25.setObjectName("graphWidget_pm25")
         self.verticalLayout.addWidget(self.graphWidget_pm25)
 
-        self.graphWidget_pm10 = PlotWidget(self.widget,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.graphWidget_pm10 = PlotWidget(self.layoutWidget3,axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.graphWidget_pm10.setEnabled(False)
         self.graphWidget_pm10.setObjectName("graphWidget_pm10")
         self.verticalLayout.addWidget(self.graphWidget_pm10)
